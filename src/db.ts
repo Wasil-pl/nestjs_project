@@ -1,5 +1,3 @@
-/* eslint-disable prettier/prettier */
-
 export interface Product {
   id: string;
   name: string;
@@ -8,11 +6,11 @@ export interface Product {
 }
 
 export interface Order {
-    id: string;
-    client: string;
-    productId: string;
-    address: string;
-  }
+  id: string;
+  client: string;
+  productId: string;
+  address: string;
+}
 
 export type DBData = {
   products: Product[];
@@ -60,5 +58,5 @@ export const db: DBData = {
       client: 'Al Swearengen',
       address: '12 Main St, Deadwood, DA 12002',
     },
-]
+  ],
 };
