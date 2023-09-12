@@ -10,33 +10,34 @@ import {
   Put,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { Order } from 'src/db';
 import { CreateOrderDTO } from 'src/products/dtos/create.order.dto';
 import { UpdateOrderDTO } from 'src/products/dtos/update-order.dto';
+import { Order } from '@prisma/client';
 
 @Controller('orders')
 export class OrdersController {
   constructor(private orderService: OrdersService) {}
 
   @Get('/')
-  public getAll(): Order[] {
-    return this.orderService.getAll();
+  public async getAll(): Promise<Order[]> {
+    const orders = await this.orderService.getAll();
+    return orders;
   }
 
   @Get('/:id')
-  public getById(@Param('id', new ParseUUIDPipe()) id: Order['id']) {
-    if (!this.orderService.getById(id)) {
-      throw new NotFoundException(`Order with id ${id} not found`);
-    }
-    return this.orderService.getById(id);
+  public async getById(@Param('id', new ParseUUIDPipe()) id: Order['id']) {
+    const order = await this.orderService.getById(id);
+    if (!order) throw new NotFoundException(`Order with id ${id} not found`);
+
+    return order;
   }
 
   @Delete('/:id')
-  public deleteById(@Param('id', new ParseUUIDPipe()) id: Order['id']) {
-    if (!this.orderService.getById(id)) {
-      throw new NotFoundException(`Order with id ${id} not found`);
-    }
-    this.orderService.delete(id);
+  public async deleteById(@Param('id', new ParseUUIDPipe()) id: Order['id']) {
+    const order = await this.orderService.getById(id);
+    if (!order) throw new NotFoundException(`Order with id ${id} not found`);
+
+    await this.orderService.delete(id);
     return { message: 'Order deleted' };
   }
 
@@ -46,14 +47,14 @@ export class OrdersController {
   }
 
   @Put('/:id')
-  update(
-    @Param('id', new ParseUUIDPipe()) id: Order['id'],
+  async update(
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() orderData: UpdateOrderDTO,
   ) {
-    if (!this.orderService.getById(id)) {
-      throw new NotFoundException(`Order with id ${id} not found`);
-    }
-    this.orderService.update(id, orderData);
+    const order = await this.orderService.getById(id);
+    if (!order) throw new NotFoundException('Order not found');
+
+    await this.orderService.update(id, orderData);
     return { message: 'Order updated' };
   }
 }

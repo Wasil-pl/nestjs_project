@@ -9,34 +9,37 @@ import {
   Put,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
-import { Product } from 'src/db';
 import { CreateProductDTO } from './dtos/create-product.dto';
 import { UpdateProductDTO } from './dtos/update-product.dto';
 import { ParseUUIDPipe } from '@nestjs/common';
+import { Product } from '@prisma/client';
 
 @Controller('products')
 export class ProductsController {
   constructor(private productsService: ProductsService) {}
 
   @Get('/')
-  public getAll(): Product[] {
-    return this.productsService.getAll();
+  public async getAll(): Promise<Product[]> {
+    const products = await this.productsService.getAll();
+    return products;
   }
 
   @Get('/:id')
-  public getById(@Param('id', new ParseUUIDPipe()) id: Product['id']) {
-    if (!this.productsService.getById(id)) {
+  public async getById(@Param('id', new ParseUUIDPipe()) id: Product['id']) {
+    const product = await this.productsService.getById(id);
+    if (!product)
       throw new NotFoundException(`Product with id ${id} not found`);
-    }
-    return this.productsService.getById(id);
+
+    return product;
   }
 
   @Delete('/:id')
-  public deleteById(@Param('id', new ParseUUIDPipe()) id: Product['id']) {
-    if (!this.productsService.getById(id)) {
+  public async deleteById(@Param('id', new ParseUUIDPipe()) id: Product['id']) {
+    const product = await this.productsService.getById(id);
+    if (!product)
       throw new NotFoundException(`Product with id ${id} not found`);
-    }
-    this.productsService.delete(id);
+
+    await this.productsService.delete(id);
     return { message: 'Product deleted' };
   }
 
@@ -46,14 +49,14 @@ export class ProductsController {
   }
 
   @Put('/:id')
-  update(
-    @Param('id', new ParseUUIDPipe()) id: Product['id'],
+  async update(
+    @Param('id', new ParseUUIDPipe()) id: string,
     @Body() productData: UpdateProductDTO,
   ) {
-    if (!this.productsService.getById(id)) {
-      throw new NotFoundException(`Product with id ${id} not found`);
-    }
-    this.productsService.update(id, productData);
+    const product = await this.productsService.getById(id);
+    if (!product) throw new NotFoundException('Product not found');
+
+    await this.productsService.updateById(id, productData);
     return { message: 'Product updated' };
   }
 }
