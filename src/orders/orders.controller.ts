@@ -10,8 +10,8 @@ import {
   Put,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
-import { CreateOrderDTO } from 'src/products/dtos/create.order.dto';
-import { UpdateOrderDTO } from 'src/products/dtos/update-order.dto';
+import { CreateOrderDTO } from 'src/orders/dtos/create-order.dto';
+import { UpdateOrderDTO } from 'src/orders/dtos/update-order.dto';
 import { Order } from '@prisma/client';
 
 @Controller('orders')
@@ -19,9 +19,8 @@ export class OrdersController {
   constructor(private orderService: OrdersService) {}
 
   @Get('/')
-  public async getAll(): Promise<Order[]> {
-    const orders = await this.orderService.getAll();
-    return orders;
+  getAll(): any {
+    return this.orderService.getAll();
   }
 
   @Get('/:id')

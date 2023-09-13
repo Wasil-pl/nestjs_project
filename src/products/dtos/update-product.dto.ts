@@ -14,6 +14,6 @@ export class UpdateProductDTO {
 
   @IsString()
   @IsNotEmpty()
-  @Transform(({ value }) => (Array.isArray(value) ? value.join(', ') : ''))
+  @Transform(({ value }) => (Array.isArray(value) ? value.join(', ') : value))
   description: string;
 }
