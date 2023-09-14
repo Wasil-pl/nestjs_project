@@ -39,7 +39,7 @@ export class ProductsController {
     return product;
   }
 
-  @Get('/extended/:id')
+  @Get(':id/extended')
   public async getByIdExtended(
     @Param('id', new ParseUUIDPipe()) id: Product['id'],
   ) {

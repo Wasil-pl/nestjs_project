@@ -19,7 +19,7 @@ export class OrdersController {
   constructor(private orderService: OrdersService) {}
 
   @Get('/')
-  getAll(): any {
+  getAll() {
     return this.orderService.getAll();
   }
 
